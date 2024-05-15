@@ -16,23 +16,28 @@ class TuringMachine:
 
     def follow_states(self, show_process=True):
 
+        n = 0
         current_tape = self.tape_start
         self.current_symbol = current_tape[1]
         possible_config = [[i[0], i[1]] for i in self.states.values()]
 
         while [self.current_state, self.current_symbol] in possible_config:
 
+            n += 1
+
             if show_process:
-                print(' Old tape:', '\n', current_tape)
-                print((1 + (3 * self.current_index)) * " ", '|', '\n',
-                      (3 * self.current_index) * " ", self.current_state, '\n')
+                print('\n', f'<><><><><><><><><><> Step {n} <><><><><><><><><><>', '\n')
+
+                print('Old tape:')
+                self.mark_current_index(current_tape)
+                print(f'--- current state: {self.current_state}')
 
             if self.current_index == len(current_tape) - 1:
                 current_tape.append('')
 
             instructions = self.states[str(self.current_state) + '.' + str(self.current_symbol)]
             if show_process:
-                print(f'Instructions: {instructions}', '\n')
+                print('\n', f'Instructions: {instructions}', '\n')
 
             new_value = instructions[2]
             new_state = instructions[3]
@@ -59,7 +64,9 @@ class TuringMachine:
 
             if self.current_state in self.final_states:
                 if show_process:
-                    print(f'Tape accepted: {current_tape}')
+                    print(f'Tape accepted:')
+                    self.mark_current_index(current_tape)
+                    print(f' --- current state: {self.current_state}')
                 else:
                     print(f'Tape accepted')
                 return True
@@ -68,12 +75,19 @@ class TuringMachine:
                 current_tape.pop()
 
             if show_process:
-                print(' New tape:', '\n', current_tape)
-                print((1 + (3 * self.current_index)) * " ", '|', '\n',
-                      (3 * self.current_index) * " ", self.current_state, '\n')
-
-            print('<><><><><><><><><><><><><><><><><><><><><>')
+                print('New tape:')
+                self.mark_current_index(current_tape)
+                print(f' ---  current state: {self.current_state}')
 
         print('Tape was not accepted!')
         return False
-      
+
+    def mark_current_index(self, tape):
+
+        for i, item in enumerate(tape):
+
+            if i == self.current_index:
+                print("\033[91m" + str(item) + "\033[0m", end=" ")
+            else:
+                print(item, end=" ")
+                
